@@ -49,7 +49,7 @@ export default class CheckpatchProvider implements vscode.CodeActionProvider {
 			childProcess.stdout.on('data', (data: Buffer) => { log += data; });
 			childProcess.stdout.on('end', () => {
 
-				var re = /(WARNING|ERROR):(.+)?(?:\n|\r\n|)#\d+: FILE: (.*):(\d+):/g;
+				var re = /(WARNING|ERROR): ?(.+)?(?:\n|\r\n|)#\d+: FILE: (.*):(\d+):/g;
 				var matches;
 				while (matches = re.exec(log)) {
 					let message = matches[2];
