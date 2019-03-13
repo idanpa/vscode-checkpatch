@@ -24,7 +24,7 @@
 	"main": "./out/extension.js",
 	"repository": {
 		"type": "git",
-		"url": "https://github.com/idanp/vscode-checkpatch"
+		"url": "https://github.com/idanpa/vscode-checkpatch"
 	},
 	"contributes": {
 		"configuration": {
