@@ -38,7 +38,7 @@
 				},
 				"checkpatch.checkpatchArgs": {
 					"type": "array",
-					"default": ["--no-tree"],
+					"default": ["--no-tree", "--show-types"],
 					"description": "Arguments for the checkpatch script"
 				}
 			}
