@@ -2,19 +2,57 @@
 import * as cp from 'child_process';
 import * as vscode from 'vscode';
 
+export interface LinterConfig {
+	path:string;
+	args:string[];
+}
+
 export default class CheckpatchProvider implements vscode.CodeActionProvider {
+	private linterConfig!: LinterConfig;
+	private documentListener!: vscode.Disposable;
 	private diagnosticCollection = vscode.languages.createDiagnosticCollection();
 
 	public activate (subscriptions: vscode.Disposable[]) {
 		subscriptions.push(this);
-		vscode.workspace.onDidOpenTextDocument(this.doLint, this, subscriptions);
 		vscode.workspace.onDidCloseTextDocument((textDocument) => {
 			this.diagnosticCollection.delete(textDocument.uri);
 		}, null, subscriptions);
 
-		vscode.workspace.onDidSaveTextDocument(this.doLint, this);
+		vscode.workspace.onDidChangeConfiguration(this.loadConfig, this, subscriptions);
+		this.loadConfig();
+	}
 
-		vscode.workspace.textDocuments.forEach(this.doLint, this);
+	private loadConfig(): void {
+		const config = vscode.workspace.getConfiguration('checkpatch');
+
+		this.linterConfig = {
+			path: config.checkpatchPath,
+			args: config.checkpatchArgs,
+		};
+
+		if (this.documentListener) {
+			this.documentListener.dispose();
+		}
+		this.diagnosticCollection.clear();
+
+		// testing given configuration:
+		var re = /total: \d* errors, \d* warnings, \d* lines checked/g;
+		let args = this.linterConfig.args.slice();
+		args.push('--no-tree - ');
+		let childProcess = cp.spawnSync(this.linterConfig.path, args, { shell: true, input: ' '});
+		if (childProcess.pid && re.test(childProcess.stdout.toString())) {
+			// all good
+		} else {
+			vscode.window.showErrorMessage(
+				`Checkpatch: calling '${this.linterConfig.path}' failed, please check checkpatch is available and change config.checkpatchPath accordingly`);
+			return;
+		}
+
+		if (config.run === 'onSave') {
+			this.documentListener = vscode.workspace.onDidSaveTextDocument(this.doLint, this);
+			vscode.workspace.onDidOpenTextDocument(this.doLint, this);
+			vscode.workspace.textDocuments.forEach(this.doLint, this);
+		}
 	}
 
 	public dispose (): void {
@@ -28,23 +66,14 @@ export default class CheckpatchProvider implements vscode.CodeActionProvider {
 			return;
 		}
 
-		const config = vscode.workspace.getConfiguration('checkpatch');
-
-		if (config.checkpatchPath === null ||
-			config.checkpatchPath === '') {
-			vscode.window.showErrorMessage(
-				'Checkpatch: config.checkpatchPath is empty, please set it to the executable');
-			return;
-		}
-
 		let log = '';
 		let diagnostics: vscode.Diagnostic[] = [];
 
-		let args = config.checkpatchArgs.slice();
+		let args = this.linterConfig.args.slice();
 		args.push('-f');
 		args.push(textDocument.fileName.replace(/\\/g,'/'));
 
-		let childProcess = cp.spawn(config.checkpatchPath, args, { shell: true });
+		let childProcess = cp.spawn(this.linterConfig.path, args, { shell: true });
 		if (childProcess.pid) {
 			childProcess.stdout.on('data', (data: Buffer) => { log += data; });
 			childProcess.stdout.on('end', () => {
@@ -74,10 +103,9 @@ export default class CheckpatchProvider implements vscode.CodeActionProvider {
 			});
 		} else {
 			vscode.window.showErrorMessage(
-				`Checkpatch: calling '${config.checkpatchPath}' failed, please check checkpatch is available and change config.checkpatchPath accordingly`);
+				`Checkpatch: calling '${this.linterConfig.path}' failed, please check checkpatch is available and change config.checkpatchPath accordingly`);
 			return;
 		}
-
 	}
 
 	public provideCodeActions (

@@ -40,6 +40,12 @@
 					"type": "array",
 					"default": ["--no-tree", "--show-types"],
 					"description": "Arguments for the checkpatch script"
+				},
+				"checkpatch.run": {
+					"type": "string",
+					"enum": ["onSave", "manual"],
+					"default": "onSave",
+					"description": "Whether the linter is run automatically on save or manually."
 				}
 			}
 		}
