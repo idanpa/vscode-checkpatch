@@ -2,7 +2,7 @@
 	"name": "checkpatch",
 	"displayName": "checkpatch",
 	"description": "Using linux kernel checkpatch tool to lint code.",
-	"version": "0.0.1",
+	"version": "0.0.2",
 	"publisher": "idanp",
 	"engines": {
 		"vscode": "^1.32.0"
