@@ -48,7 +48,13 @@
 					"description": "Whether the linter is run automatically on save or manually."
 				}
 			}
-		}
+		},
+		"commands": [
+			{
+				"command": "checkpatch.checkFile",
+				"title": "Check checkpatch on selected editor"
+			}
+		]
 	},
 	"scripts": {
 		"vscode:prepublish": "npm run compile",

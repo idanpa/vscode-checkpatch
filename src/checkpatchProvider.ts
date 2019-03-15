@@ -20,6 +20,14 @@ export default class CheckpatchProvider implements vscode.CodeActionProvider {
 
 		vscode.workspace.onDidChangeConfiguration(this.loadConfig, this, subscriptions);
 		this.loadConfig();
+
+		vscode.commands.registerCommand('checkpatch.checkFile', () => {
+			const editor = vscode.window.activeTextEditor;
+			if (!editor) {
+				return;
+			}
+			this.doLint(editor.document);
+		});
 	}
 
 	private loadConfig(): void {
