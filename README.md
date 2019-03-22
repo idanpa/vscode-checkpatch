@@ -8,10 +8,10 @@ checkpatch.pl script should be installed on your machine. It should be either ex
 pointed out by the `checkpatch.checkpatchPath` configuration.
 You can download the checkpatch script from the latest linux kernel by:
   ```bash
-	KERNEL_RAW_URL="https://raw.githubusercontent.com/torvalds/linux/master"
-	sudo wget -O /usr/bin/checkpatch.pl "${KERNEL_RAW_URL}/scripts/checkpatch.pl"
-	sudo wget -O /usr/bin/spelling.txt "${KERNEL_RAW_URL}/scripts/spelling.txt"
-	sudo chmod 755 /usr/bin/checkpatch.pl
+KERNEL_RAW_URL="https://raw.githubusercontent.com/torvalds/linux/master"
+sudo wget -O /usr/bin/checkpatch.pl "${KERNEL_RAW_URL}/scripts/checkpatch.pl"
+sudo wget -O /usr/bin/spelling.txt "${KERNEL_RAW_URL}/scripts/spelling.txt"
+sudo chmod 755 /usr/bin/checkpatch.pl
   ```
 
 ### Windows users
