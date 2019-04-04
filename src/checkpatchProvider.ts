@@ -3,8 +3,8 @@ import * as cp from 'child_process';
 import * as vscode from 'vscode';
 
 export interface LinterConfig {
-	path:string;
-	args:string[];
+	path: string;
+	args: string[];
 }
 
 export default class CheckpatchProvider implements vscode.CodeActionProvider {
@@ -12,7 +12,7 @@ export default class CheckpatchProvider implements vscode.CodeActionProvider {
 	private documentListener!: vscode.Disposable;
 	private diagnosticCollection = vscode.languages.createDiagnosticCollection();
 
-	public activate (subscriptions: vscode.Disposable[]) {
+	public activate(subscriptions: vscode.Disposable[]) {
 		subscriptions.push(this);
 		vscode.workspace.onDidCloseTextDocument((textDocument) => {
 			this.diagnosticCollection.delete(textDocument.uri);
@@ -47,7 +47,7 @@ export default class CheckpatchProvider implements vscode.CodeActionProvider {
 		var re = /total: \d* errors, \d* warnings, \d* lines checked/g;
 		let args = this.linterConfig.args.slice();
 		args.push('--no-tree - ');
-		let childProcess = cp.spawnSync(this.linterConfig.path, args, { shell: true, input: ' '});
+		let childProcess = cp.spawnSync(this.linterConfig.path, args, { shell: true, input: ' ' });
 		if (childProcess.pid && re.test(childProcess.stdout.toString())) {
 			// all good
 		} else {
@@ -63,12 +63,12 @@ export default class CheckpatchProvider implements vscode.CodeActionProvider {
 		}
 	}
 
-	public dispose (): void {
+	public dispose(): void {
 		this.diagnosticCollection.clear();
 		this.diagnosticCollection.dispose();
 	}
 
-	private doLint (
+	private doLint(
 		textDocument: vscode.TextDocument): any {
 		if (textDocument.languageId !== 'c') {
 			return;
@@ -79,7 +79,7 @@ export default class CheckpatchProvider implements vscode.CodeActionProvider {
 
 		let args = this.linterConfig.args.slice();
 		args.push('-f');
-		args.push(textDocument.fileName.replace(/\\/g,'/'));
+		args.push(textDocument.fileName.replace(/\\/g, '/'));
 
 		let childProcess = cp.spawn(this.linterConfig.path, args, { shell: true });
 		if (childProcess.pid) {
@@ -116,7 +116,7 @@ export default class CheckpatchProvider implements vscode.CodeActionProvider {
 		}
 	}
 
-	public provideCodeActions (
+	public provideCodeActions(
 		document: vscode.TextDocument, range: vscode.Range,
 		context: vscode.CodeActionContext, token: vscode.CancellationToken):
 		vscode.ProviderResult<vscode.Command[]> {
