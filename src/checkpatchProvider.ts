@@ -1,5 +1,6 @@
 'use strict';
 import * as cp from 'child_process';
+import * as path from 'path';
 import * as vscode from 'vscode';
 import { GitExtension, API as GitAPI, } from './typings/git';
 
@@ -32,7 +33,11 @@ export default class CheckpatchProvider implements vscode.CodeActionProvider {
 			if (!editor) {
 				return;
 			}
-			this.doLint(editor.document);
+			this.checkpatchFile(editor.document);
+		});
+
+		vscode.commands.registerCommand('checkpatch.checkCommit', async () => {
+			await this.checkpatchCommit();
 		});
 	}
 
@@ -63,9 +68,9 @@ export default class CheckpatchProvider implements vscode.CodeActionProvider {
 		}
 
 		if (config.run === 'onSave') {
-			this.documentListener = vscode.workspace.onDidSaveTextDocument(this.doLint, this);
-			vscode.workspace.onDidOpenTextDocument(this.doLint, this);
-			vscode.workspace.textDocuments.forEach(this.doLint, this);
+			this.documentListener = vscode.workspace.onDidSaveTextDocument(this.checkpatchFile, this);
+			vscode.workspace.onDidOpenTextDocument(this.checkpatchFile, this);
+			vscode.workspace.textDocuments.forEach(this.checkpatchFile, this);
 		}
 	}
 
@@ -74,15 +79,48 @@ export default class CheckpatchProvider implements vscode.CodeActionProvider {
 		this.diagnosticCollection.dispose();
 	}
 
-	private doLint(
+	private parseCheckpatchLog(log: string, basePath: string): number {
+		const dictionary: { [fileUri: string]: vscode.Diagnostic[] } = {};
+
+		var re = /(WARNING|ERROR): ?(.+)?(?:\n|\r\n|)#\d+: FILE: (.*):(\d+):/g;
+		var matches;
+		while (matches = re.exec(log)) {
+			let message = matches[2];
+			let errorline = parseInt(matches[4]);
+			let range = new vscode.Range(errorline - 1, 0, errorline - 1, 0);
+			let severity;
+			let fileName = matches[3];
+
+			if (matches) {
+				if (matches[1] === 'WARNING') {
+					severity = vscode.DiagnosticSeverity.Warning;
+				} else if (matches[1] === 'ERROR') {
+					severity = vscode.DiagnosticSeverity.Error;
+				}
+
+				let diagnostic = new vscode.Diagnostic(range, message, severity);
+
+				if (!(fileName in dictionary)) {
+					dictionary[fileName] = [];
+				}
+				dictionary[fileName].push(diagnostic);
+			}
+		}
+
+		for (var uri in dictionary) {
+			this.diagnosticCollection.set(vscode.Uri.file(path.join(basePath, uri)), dictionary[uri]);
+		}
+
+		return Object.keys(dictionary).length;
+	}
+
+	private checkpatchFile(
 		textDocument: vscode.TextDocument): any {
 		if (textDocument.languageId !== 'c') {
 			return;
 		}
 
 		let log = '';
-		let diagnostics: vscode.Diagnostic[] = [];
-
 		let args = this.linterConfig.args.slice();
 		args.push('-f');
 		args.push(textDocument.fileName.replace(/\\/g, '/'));
@@ -91,29 +129,53 @@ export default class CheckpatchProvider implements vscode.CodeActionProvider {
 		if (childProcess.pid) {
 			childProcess.stdout.on('data', (data: Buffer) => { log += data; });
 			childProcess.stdout.on('end', () => {
+				this.parseCheckpatchLog(log, '');
+			});
+		} else {
+			vscode.window.showErrorMessage(
+				`Checkpatch: calling '${this.linterConfig.path}' failed, please check checkpatch is available and change config.checkpatchPath accordingly`);
+			return;
+		}
+	}
 
-				var re = /(WARNING|ERROR): ?(.+)?(?:\n|\r\n|)#\d+: FILE: (.*):(\d+):/g;
-				var matches;
-				while (matches = re.exec(log)) {
-					let message = matches[2];
-					let errorline = parseInt(matches[4]);
-					let range = new vscode.Range(errorline - 1, 0, errorline - 1, 0);
-					let severity;
+	private async checkpatchCommit(): Promise<void> {
+		let repoPath = '';
+		if (this.git.repositories.length === 0) {
+			vscode.window.showErrorMessage(`Checkpatch: No repositories in workspace`);
+			return;
+		}
+		if (this.git.repositories.length === 1) {
+			repoPath = this.git.repositories[0].rootUri.path;
+		} else {
+			const pickItems: vscode.QuickPickItem[] = this.git.repositories.map(repo => {
+				return { label: path.basename(repo.rootUri.fsPath), description: repo.rootUri.fsPath };
+			});
+			const value = await vscode.window.showQuickPick(pickItems, { placeHolder: 'Select git repo' });
+			if (value && value.description) {
+				repoPath = value.description;
+			} else {
+				return;
+			}
+		}
+		//TODO: select commit from repo
 
-					if (matches) {
-						if (matches[1] === 'WARNING') {
-							severity = vscode.DiagnosticSeverity.Warning;
-						} else if (matches[1] === 'ERROR') {
-							severity = vscode.DiagnosticSeverity.Error;
-						}
+		let log = '';
+		let args = this.linterConfig.args.slice();
+		args.push('-g');
+		args.push('HEAD');
 
-						let diagnostic =
-							new vscode.Diagnostic(range, message, severity);
-						diagnostics.push(diagnostic);
-					}
+		let childProcess = cp.spawn(this.linterConfig.path, args, { shell: true, cwd: repoPath });
+		if (childProcess.pid) {
+			childProcess.stdout.on('data', (data: Buffer) => { log += data; });
+			childProcess.stdout.on('end', () => {
+				// for user to see only commit related problems:
+				this.diagnosticCollection.clear();
+				const numError = this.parseCheckpatchLog(log, repoPath);
+				if (numError > 0) {
+					vscode.window.showErrorMessage(`Checkpatch: commit has style problems, please review the problems pane`);
+				} else {
+					vscode.window.showInformationMessage(`Checkpatch: commit has no obvious style problems and is ready for submission.`);
 				}
-
-				this.diagnosticCollection.set(textDocument.uri, diagnostics);
 			});
 		} else {
 			vscode.window.showErrorMessage(

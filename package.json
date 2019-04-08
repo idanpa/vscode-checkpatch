@@ -52,7 +52,11 @@
 		"commands": [
 			{
 				"command": "checkpatch.checkFile",
-				"title": "Check checkpatch on selected editor"
+				"title": "Checkpatch selected file"
+			},
+			{
+				"command": "checkpatch.checkCommit",
+				"title": "Checkpatch commit"
 			}
 		]
 	},
