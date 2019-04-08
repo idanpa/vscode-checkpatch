@@ -86,7 +86,7 @@ export default class CheckpatchProvider implements vscode.CodeActionProvider {
 		while (matches = re.exec(log)) {
 			let message = matches[2];
 			let errorline = parseInt(matches[4]);
-			let range = new vscode.Range(errorline - 1, 0, errorline - 1, 0);
+			let range = new vscode.Range(errorline - 1, 0, errorline - 1, Number.MAX_VALUE);
 			let severity;
 			let fileName = matches[3];
 
