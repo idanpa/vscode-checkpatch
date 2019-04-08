@@ -17,6 +17,7 @@ export default class CheckpatchProvider implements vscode.CodeActionProvider {
 	public activate(subscriptions: vscode.Disposable[]) {
 		subscriptions.push(this);
 		vscode.workspace.onDidCloseTextDocument((textDocument) => {
+			// FIXME: this is the wrong event
 			this.diagnosticCollection.delete(textDocument.uri);
 		}, null, subscriptions);
 
