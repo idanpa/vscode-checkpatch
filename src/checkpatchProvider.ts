@@ -172,6 +172,7 @@ export default class CheckpatchProvider implements vscode.CodeActionProvider {
 				const numError = this.parseCheckpatchLog(log, repoPath);
 				if (numError > 0) {
 					vscode.window.showErrorMessage(`Checkpatch: commit has style problems, please review the problems pane`);
+					vscode.commands.executeCommand('workbench.actions.view.problems');
 				} else {
 					vscode.window.showInformationMessage(`Checkpatch: commit has no obvious style problems and is ready for submission.`);
 				}
