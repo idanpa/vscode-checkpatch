@@ -10,7 +10,7 @@ export interface LinterConfig {
 export default class CheckpatchProvider implements vscode.CodeActionProvider {
 	private linterConfig!: LinterConfig;
 	private documentListener!: vscode.Disposable;
-	private diagnosticCollection = vscode.languages.createDiagnosticCollection();
+	private diagnosticCollection = vscode.languages.createDiagnosticCollection('checkpatch');
 
 	public activate(subscriptions: vscode.Disposable[]) {
 		subscriptions.push(this);
