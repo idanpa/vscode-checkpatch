@@ -30,10 +30,9 @@ export default class CheckpatchProvider implements vscode.CodeActionProvider {
 
 		vscode.commands.registerCommand('checkpatch.checkFile', () => {
 			const editor = vscode.window.activeTextEditor;
-			if (!editor) {
-				return;
+			if (editor) {
+				this.checkpatchFile(editor.document);
 			}
-			this.checkpatchFile(editor.document);
 		});
 
 		vscode.commands.registerCommand('checkpatch.checkCommit', async () => {
