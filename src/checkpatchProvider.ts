@@ -1,6 +1,7 @@
 'use strict';
 import * as cp from 'child_process';
 import * as vscode from 'vscode';
+import { GitExtension, API as GitAPI, } from './typings/git';
 
 export interface LinterConfig {
 	path: string;
@@ -11,6 +12,7 @@ export default class CheckpatchProvider implements vscode.CodeActionProvider {
 	private linterConfig!: LinterConfig;
 	private documentListener!: vscode.Disposable;
 	private diagnosticCollection = vscode.languages.createDiagnosticCollection('checkpatch');
+	private git!: GitAPI;
 
 	public activate(subscriptions: vscode.Disposable[]) {
 		subscriptions.push(this);
@@ -20,6 +22,9 @@ export default class CheckpatchProvider implements vscode.CodeActionProvider {
 
 		vscode.workspace.onDidChangeConfiguration(this.loadConfig, this, subscriptions);
 		this.loadConfig();
+
+		const gitExtension = vscode.extensions.getExtension<GitExtension>('vscode.git')!.exports;
+		this.git = gitExtension.getAPI(1);
 
 		vscode.commands.registerCommand('checkpatch.checkFile', () => {
 			const editor = vscode.window.activeTextEditor;
