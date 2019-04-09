@@ -35,9 +35,7 @@ export default class CheckpatchProvider implements vscode.CodeActionProvider {
 			}
 		});
 
-		vscode.commands.registerCommand('checkpatch.checkCommit', async () => {
-			await this.checkpatchCommit();
-		});
+		vscode.commands.registerCommand('checkpatch.checkCommit', async () => await this.checkpatchCommit());
 	}
 
 	private loadConfig(): void {
@@ -126,10 +124,8 @@ export default class CheckpatchProvider implements vscode.CodeActionProvider {
 
 		let childProcess = cp.spawn(this.linterConfig.path, args, { shell: true });
 		if (childProcess.pid) {
-			childProcess.stdout.on('data', (data: Buffer) => { log += data; });
-			childProcess.stdout.on('end', () => {
-				this.parseCheckpatchLog(log, '');
-			});
+			childProcess.stdout.on('data', (data: Buffer) => log += data);
+			childProcess.stdout.on('end', () => this.parseCheckpatchLog(log, ''));
 		} else {
 			vscode.window.showErrorMessage(
 				`Checkpatch: calling '${this.linterConfig.path}' failed, please check checkpatch is available and change config.checkpatchPath accordingly`);
@@ -165,7 +161,7 @@ export default class CheckpatchProvider implements vscode.CodeActionProvider {
 
 		let childProcess = cp.spawn(this.linterConfig.path, args, { shell: true, cwd: repoPath });
 		if (childProcess.pid) {
-			childProcess.stdout.on('data', (data: Buffer) => { log += data; });
+			childProcess.stdout.on('data', (data: Buffer) => log += data);
 			childProcess.stdout.on('end', () => {
 				// for user to see only commit related problems:
 				this.diagnosticCollection.clear();
