@@ -88,6 +88,7 @@ export default class CheckpatchProvider implements vscode.CodeActionProvider {
 			let severity;
 			let fileName = matches[3];
 
+			// TODO: using map() an matches would be nicer
 			if (matches) {
 				if (matches[1] === 'WARNING') {
 					severity = vscode.DiagnosticSeverity.Warning;
@@ -96,6 +97,7 @@ export default class CheckpatchProvider implements vscode.CodeActionProvider {
 				}
 
 				let diagnostic = new vscode.Diagnostic(range, message, severity);
+				diagnostic.code = 'checkpatch';
 
 				if (!(fileName in dictionary)) {
 					dictionary[fileName] = [];
