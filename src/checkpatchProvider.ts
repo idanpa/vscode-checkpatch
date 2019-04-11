@@ -2,11 +2,15 @@
 import * as cp from 'child_process';
 import * as path from 'path';
 import * as vscode from 'vscode';
-import { GitExtension, API as GitAPI, } from './typings/git';
+import { GitExtension, API as GitAPI, Repository, } from './typings/git';
 
 export interface LinterConfig {
 	path: string;
 	args: string[];
+}
+
+interface RepoPickItem extends vscode.QuickPickItem {
+	repo: Repository;
 }
 
 export default class CheckpatchProvider implements vscode.CodeActionProvider {
@@ -136,49 +140,63 @@ export default class CheckpatchProvider implements vscode.CodeActionProvider {
 	}
 
 	private async checkpatchCommit(): Promise<void> {
-		let repoPath = '';
+		let repo: Repository;
 		if (this.git.repositories.length === 0) {
 			vscode.window.showErrorMessage(`Checkpatch: No repositories in workspace`);
 			return;
 		}
 		if (this.git.repositories.length === 1) {
-			repoPath = this.git.repositories[0].rootUri.path;
+			repo = this.git.repositories[0];
 		} else {
-			const pickItems: vscode.QuickPickItem[] = this.git.repositories.map(repo => {
-				return { label: path.basename(repo.rootUri.fsPath), description: repo.rootUri.fsPath };
+			const reposItems: RepoPickItem[] = this.git.repositories.map(repo => {
+				return {
+					label: path.basename(repo.rootUri.fsPath),
+					description: repo.rootUri.fsPath,
+					repo: repo
+				};
 			});
-			const value = await vscode.window.showQuickPick(pickItems, { placeHolder: 'Select git repo' });
-			if (value && value.description) {
-				repoPath = value.description;
+			const value = await vscode.window.showQuickPick(reposItems, { placeHolder: 'Select git repo' });
+			if (value && value.repo) {
+				repo = value.repo;
 			} else {
 				return;
 			}
 		}
-		//TODO: select commit from repo
 
-		let log = '';
-		let args = this.linterConfig.args.slice();
-		args.push('-g');
-		args.push('HEAD');
+		const commits = await repo.log({maxEntries: 8});
+		const commitsItems: vscode.QuickPickItem[] = commits.map(commit => {
+			return {
+				label: commit.message,
+				description: commit.hash
+			};
+		});
+		const commitValue = await vscode.window.showQuickPick(commitsItems, { placeHolder: 'Select commit' });
 
-		let childProcess = cp.spawn(this.linterConfig.path, args, { shell: true, cwd: repoPath });
-		if (childProcess.pid) {
-			childProcess.stdout.on('data', (data: Buffer) => log += data);
-			childProcess.stdout.on('end', () => {
-				// for user to see only commit related problems:
-				this.diagnosticCollection.clear();
-				const numError = this.parseCheckpatchLog(log, repoPath);
-				if (numError > 0) {
-					vscode.window.showErrorMessage(`Checkpatch: commit has style problems, please review the problems pane`);
-					vscode.commands.executeCommand('workbench.actions.view.problems');
-				} else {
-					vscode.window.showInformationMessage(`Checkpatch: commit has no obvious style problems and is ready for submission.`);
-				}
-			});
-		} else {
-			vscode.window.showErrorMessage(
-				`Checkpatch: calling '${this.linterConfig.path}' failed, please check checkpatch is available and change config.checkpatchPath accordingly`);
-			return;
+		if (commitValue && commitValue.description) {
+			let log = '';
+			let args = this.linterConfig.args.slice();
+			args.push('-g');
+			args.push(commitValue.description);
+
+			let childProcess = cp.spawn(this.linterConfig.path, args, { shell: true, cwd: repo.rootUri.fsPath });
+			if (childProcess.pid) {
+				childProcess.stdout.on('data', (data: Buffer) => log += data);
+				childProcess.stdout.on('end', () => {
+					// for user to see only commit related problems:
+					this.diagnosticCollection.clear();
+					const numError = this.parseCheckpatchLog(log, repo.rootUri.fsPath);
+					if (numError > 0) {
+						vscode.window.showErrorMessage(`Checkpatch: commit has style problems, please review the problems pane`);
+						vscode.commands.executeCommand('workbench.actions.view.problems');
+					} else {
+						vscode.window.showInformationMessage(`Checkpatch: commit has no obvious style problems and is ready for submission.`);
+					}
+				});
+			} else {
+				vscode.window.showErrorMessage(
+					`Checkpatch: calling '${this.linterConfig.path}' failed, please check checkpatch is available and change config.checkpatchPath accordingly`);
+				return;
+			}
 		}
 	}
 
