@@ -4,7 +4,7 @@
 
 ## Installation
 
-checkpatch.pl script should be installed on your machine. It should be either exposed through $PATH or
+[checkpatch.pl](https://github.com/torvalds/linux/blob/master/scripts/checkpatch.pl) script should be installed on your machine. It should be either exposed through $PATH or
 pointed out by the `checkpatch.checkpatchPath` configuration.
 You can download the checkpatch script from the latest linux kernel by (bash):
   ```bash
