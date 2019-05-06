@@ -39,12 +39,18 @@
 				},
 				"checkpatch.checkpatchArgs": {
 					"type": "array",
-					"default": ["--no-tree", "--show-types"],
+					"default": [
+						"--no-tree",
+						"--show-types"
+					],
 					"description": "Arguments for the checkpatch script"
 				},
 				"checkpatch.run": {
 					"type": "string",
-					"enum": ["onSave", "manual"],
+					"enum": [
+						"onSave",
+						"manual"
+					],
 					"default": "onSave",
 					"description": "Whether the linter is run automatically on save or manually."
 				}
@@ -69,11 +75,11 @@
 		"test": "npm run compile && node ./node_modules/vscode/bin/test"
 	},
 	"devDependencies": {
-		"typescript": "^3.3.1",
-		"vscode": "^1.1.28",
-		"tslint": "^5.12.1",
-		"@types/node": "^10.12.21",
-		"@types/mocha": "^2.2.42"
+		"@types/mocha": "^2.2.42",
+		"@types/node": "^10.14.6",
+		"tslint": "^5.16.0",
+		"typescript": "^3.4.5",
+		"vscode": "^1.1.33"
 	},
 	"extensionDependencies": [
 		"vscode.git"
