@@ -204,6 +204,6 @@ export default class CheckpatchProvider implements vscode.CodeActionProvider {
 		document: vscode.TextDocument, range: vscode.Range,
 		context: vscode.CodeActionContext, token: vscode.CancellationToken):
 		vscode.ProviderResult<vscode.Command[]> {
-		throw new Error('Not implemented.');
+		return [];
 	}
 }
