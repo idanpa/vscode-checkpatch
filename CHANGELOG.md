@@ -1,5 +1,8 @@
 # Change Log
 
+## 0.0.4
+- Check specific commit
+- Bug fixes
 
 ## 0.0.3
 
