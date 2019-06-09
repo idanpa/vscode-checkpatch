@@ -22,7 +22,7 @@ export default class CheckpatchProvider implements vscode.CodeActionProvider {
 	public activate(subscriptions: vscode.Disposable[]) {
 		subscriptions.push(this);
 		vscode.workspace.onDidCloseTextDocument((textDocument) => {
-			// FIXME: this is the wrong event
+			// FIXME: this is the wrong event, happening only when removed from cache
 			this.diagnosticCollection.delete(textDocument.uri);
 		}, null, subscriptions);
 
@@ -40,6 +40,13 @@ export default class CheckpatchProvider implements vscode.CodeActionProvider {
 		});
 
 		vscode.commands.registerCommand('checkpatch.checkCommit', async () => await this.checkpatchCommit());
+
+		vscode.commands.registerCommand('checkpatch.toggleAutoRun', () => {
+			const config = vscode.workspace.getConfiguration('checkpatch');
+			config.update('run',
+				(config.run === 'onSave') ? 'manual' : 'onSave',
+				vscode.ConfigurationTarget.Workspace);
+		});
 	}
 
 	private loadConfig(): void {

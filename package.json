@@ -59,11 +59,15 @@
 		"commands": [
 			{
 				"command": "checkpatch.checkFile",
-				"title": "Checkpatch selected file"
+				"title": "Checkpatch Selected File"
 			},
 			{
 				"command": "checkpatch.checkCommit",
-				"title": "Checkpatch commit"
+				"title": "Checkpatch Commit"
+			},
+			{
+				"command": "checkpatch.toggleAutoRun",
+				"title": "Toggle Checkpatch for the Current Workspace"
 			}
 		]
 	},

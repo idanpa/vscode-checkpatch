@@ -27,9 +27,10 @@ Additionally, a perl interpreter should also be installed - tested with [ActiveP
 GNU 'diff' executable should also be available (can be done by installing [git-for-windows](https://git-scm.com/download/win) and adding it to PATH).
 
 ## Commands
-* `checkpatch.checkFile` checks selected file (if the run mode is manual)
-* `checkpatch.checkCommit` select specific commit to be tested
+* `checkpatch.checkFile` Check selected file (if the run mode is manual)
+* `checkpatch.checkCommit` Select specific commit to be tested
+* `checkpatch.toggleAutoRun` Toggle checkpatch for the current workspace
 
 ## settings.json
 * `checkpatch.checkpatchArgs` let you add arguments such as `--ignore BLOCK_COMMENT_STYLE`, `--max-line-length=120`  
-* `checkpatch.run` controls whether the liniting is automatic or manually triggered using the `checkpatch.checkFile` command.
+* `checkpatch.run` control whether the linting is automatic or manually triggered using the `checkpatch.checkFile` command.
