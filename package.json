@@ -40,8 +40,7 @@
 				"checkpatch.checkpatchArgs": {
 					"type": "array",
 					"default": [
-						"--no-tree",
-						"--show-types"
+						"--no-tree"
 					],
 					"description": "Arguments for the checkpatch script"
 				},

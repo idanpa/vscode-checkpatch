@@ -132,7 +132,7 @@ export default class CheckpatchProvider implements vscode.CodeActionProvider {
 
 		let log = '';
 		let args = this.linterConfig.args.slice();
-		args.push('-f');
+		args.push('--show-types -f');
 		args.push(textDocument.fileName.replace(/\\/g, '/'));
 
 		let childProcess = cp.spawn(this.linterConfig.path, args, { shell: true });
