@@ -68,6 +68,28 @@
 				"command": "checkpatch.toggleAutoRun",
 				"title": "Toggle Checkpatch for the Current Workspace"
 			}
+		],
+		"problemMatchers": [
+			{
+				"name": "checkpatch",
+				"owner": "checkpatch",
+				"fileLocation": [
+					"relative",
+					"${workspaceRoot}"
+				],
+				"pattern": [
+					{
+						"regexp": "(WARNING|ERROR): ?(.+)",
+						"severity": 1,
+						"message": 2
+					},
+					{
+						"regexp": "#\\d+: FILE: (.*):(\\d+):",
+						"file": 1,
+						"line": 2
+					}
+				]
+			}
 		]
 	},
 	"scripts": {

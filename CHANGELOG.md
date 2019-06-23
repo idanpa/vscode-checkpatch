@@ -1,5 +1,8 @@
 # Change Log
 
+## 0.0.5
+- Add `$checkpatch` problemMatcher
+
 ## 0.0.4
 - Check specific commit
 - Bug fixes
