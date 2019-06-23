@@ -90,25 +90,19 @@ export default class CheckpatchProvider implements vscode.CodeActionProvider {
 	private parseCheckpatchLog(log: string, basePath: string): number {
 		const dictionary: { [fileUri: string]: vscode.Diagnostic[] } = {};
 
-		var re = /(WARNING|ERROR): ?(.+)?(?:\n|\r\n|)#\d+: FILE: (.*):(\d+):/g;
+		var re = /(WARNING|ERROR): ?(.+):(.+)?(?:\n|\r\n|)#\d+: FILE: (.*):(\d+):/g;
 		var matches;
 		while (matches = re.exec(log)) {
-			let message = matches[2];
-			let errorline = parseInt(matches[4]);
-			let range = new vscode.Range(errorline - 1, 0, errorline - 1, Number.MAX_VALUE);
-			let severity;
-			let fileName = matches[3];
-
-			// TODO: using map() an matches would be nicer
 			if (matches) {
-				if (matches[1] === 'WARNING') {
-					severity = vscode.DiagnosticSeverity.Warning;
-				} else if (matches[1] === 'ERROR') {
-					severity = vscode.DiagnosticSeverity.Error;
-				}
+				let type = matches[2];
+				let message = matches[3];
+				let fileName = matches[4];
+				let errorline = parseInt(matches[5]);
+				let range = new vscode.Range(errorline - 1, 0, errorline - 1, Number.MAX_VALUE);
 
-				let diagnostic = new vscode.Diagnostic(range, message, severity);
-				diagnostic.code = 'checkpatch';
+				let diagnostic = new vscode.Diagnostic(range, `${type}:${message}`, vscode.DiagnosticSeverity.Warning);
+				diagnostic.code = type;
+				diagnostic.source = 'checkpatch';
 
 				if (!(fileName in dictionary)) {
 					dictionary[fileName] = [];
