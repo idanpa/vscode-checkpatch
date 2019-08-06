@@ -93,7 +93,7 @@
 		],
 		"languages": [
 			{
-				"id": "checkpatch config",
+				"id": "checkpatch",
 				"extensions": [
 					".checkpatch.conf"
 				],
@@ -102,9 +102,9 @@
 		],
 		"grammars": [
 			{
-				"language": "checkpatch config",
+				"language": "checkpatch",
 				"scopeName": "text.checkpatch",
-				"path": "./src/checkpatch.conf.tmGrammer.json"
+				"path": "./syntaxes/checkpatch.conf.tmGrammer.json"
 			}
 		]
 	},
