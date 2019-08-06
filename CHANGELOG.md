@@ -1,5 +1,8 @@
 # Change Log
 
+## 0.0.6
+- Bug fix
+
 ## 0.0.5
 - Add `$checkpatch` problemMatcher
 - Add `checkpatch.toggleAutoRun`
