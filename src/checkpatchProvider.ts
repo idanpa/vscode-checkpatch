@@ -93,22 +93,20 @@ export default class CheckpatchProvider implements vscode.CodeActionProvider {
 		var re = /(WARNING|ERROR): ?(.+):(.+)?(?:\n|\r\n|)#\d+: FILE: (.*):(\d+):/g;
 		var matches;
 		while (matches = re.exec(log)) {
-			if (matches) {
-				let type = matches[2];
-				let message = matches[3];
-				let fileName = matches[4];
-				let errorline = parseInt(matches[5]);
-				let range = new vscode.Range(errorline - 1, 0, errorline - 1, Number.MAX_VALUE);
+			let type = matches[2];
+			let message = matches[3];
+			let fileName = matches[4];
+			let errorline = parseInt(matches[5]);
+			let range = new vscode.Range(errorline - 1, 0, errorline - 1, Number.MAX_VALUE);
 
-				let diagnostic = new vscode.Diagnostic(range, `${type}:${message}`, vscode.DiagnosticSeverity.Warning);
-				diagnostic.code = type;
-				diagnostic.source = 'checkpatch';
+			let diagnostic = new vscode.Diagnostic(range, `${type}:${message}`, vscode.DiagnosticSeverity.Warning);
+			diagnostic.code = type;
+			diagnostic.source = 'checkpatch';
 
-				if (!(fileName in dictionary)) {
-					dictionary[fileName] = [];
-				}
-				dictionary[fileName].push(diagnostic);
+			if (!(fileName in dictionary)) {
+				dictionary[fileName] = [];
 			}
+			dictionary[fileName].push(diagnostic);
 		}
 
 		for (var uri in dictionary) {
@@ -164,7 +162,7 @@ export default class CheckpatchProvider implements vscode.CodeActionProvider {
 			}
 		}
 
-		const commits = await repo.log({maxEntries: 8});
+		const commits = await repo.log({ maxEntries: 8 });
 		const commitsItems: vscode.QuickPickItem[] = commits.map(commit => {
 			return {
 				label: commit.message,
