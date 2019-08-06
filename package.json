@@ -90,6 +90,22 @@
 					}
 				]
 			}
+		],
+		"languages": [
+			{
+				"id": "checkpatch config",
+				"extensions": [
+					".checkpatch.conf"
+				],
+				"configuration": "./src/language-configuration.json"
+			}
+		],
+		"grammars": [
+			{
+				"language": "checkpatch config",
+				"scopeName": "text.checkpatch",
+				"path": "./src/checkpatch.conf.tmGrammer.json"
+			}
 		]
 	},
 	"scripts": {
