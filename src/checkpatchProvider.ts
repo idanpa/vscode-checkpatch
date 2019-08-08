@@ -99,7 +99,7 @@ export default class CheckpatchProvider implements vscode.CodeActionProvider {
 			let errorline = parseInt(matches[5]);
 			let range = new vscode.Range(errorline - 1, 0, errorline - 1, Number.MAX_VALUE);
 
-			let diagnostic = new vscode.Diagnostic(range, `${type}:${message}`, vscode.DiagnosticSeverity.Warning);
+			let diagnostic = new vscode.Diagnostic(range, `${type}:${message}`, vscode.DiagnosticSeverity.Information);
 			diagnostic.code = type;
 			diagnostic.source = 'checkpatch';
 
