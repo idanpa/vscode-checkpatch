@@ -89,7 +89,7 @@ export default class CheckpatchProvider implements vscode.CodeActionProvider {
 	private parseCheckpatchLog(log: string, basePath: string): number {
 		const dictionary: { [fileUri: string]: vscode.Diagnostic[] } = {};
 
-		var re = /(WARNING|ERROR): ?(.+):(.+)?(?:\n|\r\n|)#\d+: FILE: (.*):(\d+):/g;
+		var re = /(WARNING|ERROR|CHECK): ?(.+):(.+)?(?:\n|\r\n|)#\d+: FILE: (.*):(\d+):/g;
 		var matches;
 		while (matches = re.exec(log)) {
 			let type = matches[2];
