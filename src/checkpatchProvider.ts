@@ -64,8 +64,7 @@ export default class CheckpatchProvider implements vscode.CodeActionProvider {
 
 		// testing given configuration:
 		var re = /total: \d* errors, \d* warnings, \d* lines checked/g;
-		let args = this.linterConfig.args.slice();
-		args.push('--no-tree - ');
+		var args = ['--no-tree'];
 		let childProcess = cp.spawnSync(this.linterConfig.path, args, { shell: true, input: ' ' });
 		if (childProcess.pid && re.test(childProcess.stdout.toString())) {
 			// all good
