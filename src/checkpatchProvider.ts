@@ -128,6 +128,8 @@ export default class CheckpatchProvider implements vscode.CodeActionProvider {
 
 		let childProcess = cp.spawn(this.linterConfig.path, args, { shell: true });
 		if (childProcess.pid) {
+			// clean old diagostics. Prevents files with only one warning from being updated
+			this.diagnosticCollection.delete(textDocument.uri);
 			childProcess.stdout.on('data', (data: Buffer) => log += data);
 			childProcess.stdout.on('end', () => this.parseCheckpatchLog(log, ''));
 		} else {
