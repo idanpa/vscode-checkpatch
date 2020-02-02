@@ -71,7 +71,10 @@ export default class CheckpatchProvider implements vscode.CodeActionProvider {
 			// all good
 		} else {
 			vscode.window.showErrorMessage(
-				`Checkpatch: calling '${this.linterConfig.path}' failed, please check checkpatch is available and change config.checkpatchPath accordingly`);
+				`Checkpatch: calling '${this.linterConfig.path}' failed, please check checkpatch.checkpatchPath and checkpatch.checkpatchPath configutations.`);
+			console.log(`Checkpatch: '${this.linterConfig.path}' '${args}'`)
+			if (childProcess.stderr)
+				console.log(`Checkpatch: '${childProcess.stderr.toString()}'`)
 			return;
 		}
 
