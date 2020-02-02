@@ -35,7 +35,7 @@
 				"checkpatch.checkpatchPath": {
 					"type": "string",
 					"default": "checkpatch.pl",
-					"description": "Path to the checkpatch script"
+					"description": "Path to the checkpatch.pl script"
 				},
 				"checkpatch.checkpatchArgs": {
 					"type": "array",
@@ -52,6 +52,11 @@
 					],
 					"default": "onSave",
 					"description": "Whether the linter is run automatically on save or manually."
+				},
+				"checkpatch.exclude": {
+					"type": "array",
+					"default": [],
+					"description": "Glob patterns for excluding files and folders from automatic checks."
 				}
 			}
 		},
@@ -124,5 +129,8 @@
 	},
 	"extensionDependencies": [
 		"vscode.git"
-	]
+	],
+	"dependencies": {
+		"minimatch": "^3.0.3"
+	}
 }

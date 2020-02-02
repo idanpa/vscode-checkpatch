@@ -4,7 +4,7 @@
 
 ## Installation
 
-[checkpatch.pl](https://github.com/torvalds/linux/blob/master/scripts/checkpatch.pl) script should be installed on your machine. It should be either exposed through $PATH or
+[checkpatch.pl](https://github.com/torvalds/linux/blob/master/scripts/checkpatch.pl) script should be either exposed through $PATH or
 pointed out by the `checkpatch.checkpatchPath` configuration.
 
 ### Linux / [WSL Remote Development](https://code.visualstudio.com/docs/remote/wsl)
@@ -22,15 +22,17 @@ cmd as administrator:
 curl -o %WINDIR%/System32/checkpatch.pl "https://raw.githubusercontent.com/torvalds/linux/master/scripts/checkpatch.pl"
 curl -o %WINDIR%/System32/spelling.txt "https://raw.githubusercontent.com/torvalds/linux/master/scripts/spelling.txt"
   ```
-Additionally, a perl interpreter should also be installed - tested with [ActivePerl Community Edition](https://www.activestate.com/products/activeperl/downloads/).  
+On windows, a perl interpreter should also be installed - tested with [ActivePerl Community Edition](https://www.activestate.com/products/activeperl/downloads/).  
 *.pl files should be configured to be opened by the interpreter by default (double click on any *.pl file and choose ActivePerl as the default program).
 GNU 'diff' executable should also be available (can be done by installing [git-for-windows](https://git-scm.com/download/win) and adding it to PATH).
 
 ## Commands
 * `checkpatch.checkFile` Check selected file (if the run mode is manual)
 * `checkpatch.checkCommit` Select specific commit to be tested
-* `checkpatch.toggleAutoRun` Toggle checkpatch for the current workspace
+* `checkpatch.toggleAutoRun` Toggle automatic checkpatch for the current workspace
 
 ## settings.json
-* `checkpatch.checkpatchArgs` let you add arguments such as `--ignore BLOCK_COMMENT_STYLE`, `--max-line-length=120`  
-* `checkpatch.run` control whether the linting is automatic or manually triggered using the `checkpatch.checkFile` command.
+* `checkpatch.checkpatchPath` path to the checkpatch.pl script
+* `checkpatch.checkpatchArgs` checkpatch arguments to use
+* `checkpatch.run` control whether the linting is automatic on save or manually triggered using the `checkpatch.checkFile` command.
+* `checkpatch.exclude` Glob patterns for excluding files and folders from automatic checks.

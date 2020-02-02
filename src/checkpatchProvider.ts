@@ -2,11 +2,13 @@
 import * as cp from 'child_process';
 import * as path from 'path';
 import * as vscode from 'vscode';
+import * as minimatch from 'minimatch';
 import { GitExtension, API as GitAPI, Repository, } from './typings/git';
 
 export interface LinterConfig {
 	path: string;
 	args: string[];
+	excludeGlobs: string[];
 }
 
 interface RepoPickItem extends vscode.QuickPickItem {
@@ -55,6 +57,7 @@ export default class CheckpatchProvider implements vscode.CodeActionProvider {
 		this.linterConfig = {
 			path: config.checkpatchPath,
 			args: config.checkpatchArgs,
+			excludeGlobs: config.exclude,
 		};
 
 		if (this.documentListener) {
@@ -123,6 +126,11 @@ export default class CheckpatchProvider implements vscode.CodeActionProvider {
 		textDocument: vscode.TextDocument): any {
 		if (textDocument.languageId !== 'c') {
 			return;
+		}
+		for (var excludeGlob of this.linterConfig.excludeGlobs) {
+			if (minimatch(textDocument.fileName, excludeGlob)) {
+				return;
+			}
 		}
 
 		let log = '';
