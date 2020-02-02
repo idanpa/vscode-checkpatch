@@ -67,8 +67,7 @@ export default class CheckpatchProvider implements vscode.CodeActionProvider {
 
 		// testing given configuration:
 		var re = /total: \d* errors, \d* warnings, \d* lines checked/g;
-		let args = this.linterConfig.args.slice();
-		args.push('--no-tree - ');
+		var args = ['--no-tree'];
 		let childProcess = cp.spawnSync(this.linterConfig.path, args, { shell: true, input: ' ' });
 		if (childProcess.pid && re.test(childProcess.stdout.toString())) {
 			// all good
@@ -96,7 +95,7 @@ export default class CheckpatchProvider implements vscode.CodeActionProvider {
 	private parseCheckpatchLog(log: string, basePath: string): number {
 		const dictionary: { [fileUri: string]: vscode.Diagnostic[] } = {};
 
-		var re = /(WARNING|ERROR): ?(.+):(.+)?(?:\n|\r\n|)#\d+: FILE: (.*):(\d+):/g;
+		var re = /(WARNING|ERROR|CHECK): ?(.+):(.+)?(?:\n|\r\n|)#\d+: FILE: (.*):(\d+):/g;
 		var matches;
 		while (matches = re.exec(log)) {
 			let type = matches[2];
@@ -140,6 +139,8 @@ export default class CheckpatchProvider implements vscode.CodeActionProvider {
 
 		let childProcess = cp.spawn(this.linterConfig.path, args, { shell: true });
 		if (childProcess.pid) {
+			// clean old diagostics. Prevents files with only one warning from being updated
+			this.diagnosticCollection.delete(textDocument.uri);
 			childProcess.stdout.on('data', (data: Buffer) => log += data);
 			childProcess.stdout.on('end', () => this.parseCheckpatchLog(log, ''));
 		} else {
