@@ -68,8 +68,9 @@ export default class CheckpatchProvider implements vscode.CodeActionProvider {
 		// testing given configuration:
 		var re = /total: \d* errors, \d* warnings,( \d* checks,)? \d* lines checked/g;
 		let args = this.linterConfig.args.slice();
-        args.push('--no-tree - ');
-		let childProcess = cp.spawnSync(this.linterConfig.path, args, { shell: true, input: ' ' });
+		let cwd = vscode.workspace.workspaceFolders ? vscode.workspace.workspaceFolders[0].name : undefined;
+		args.push('--no-tree - ');
+		let childProcess = cp.spawnSync(this.linterConfig.path, args, {shell: true, input: ' ', cwd: cwd });
 		if (childProcess.pid && re.test(childProcess.stdout.toString())) {
 			// all good
 		} else {
@@ -135,10 +136,11 @@ export default class CheckpatchProvider implements vscode.CodeActionProvider {
 
 		let log = '';
 		let args = this.linterConfig.args.slice();
+		let cwd = vscode.workspace.workspaceFolders ? vscode.workspace.workspaceFolders[0].name : undefined;
 		args.push('--show-types -f');
 		args.push(textDocument.fileName.replace(/\\/g, '/'));
 
-		let childProcess = cp.spawn(this.linterConfig.path, args, { shell: true });
+		let childProcess = cp.spawn(this.linterConfig.path, args, { shell: true, cwd: cwd });
 		if (childProcess.pid) {
 			// clean old diagostics. Prevents files with only one warning from being updated
 			this.diagnosticCollection.delete(textDocument.uri);
