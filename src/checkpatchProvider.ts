@@ -9,11 +9,19 @@ export interface LinterConfig {
 	path: string;
 	args: string[];
 	excludeGlobs: string[];
+	diagnosticSeverity: vscode.DiagnosticSeverity;
 }
 
 interface RepoPickItem extends vscode.QuickPickItem {
 	repo: Repository;
 }
+
+const diagSeverityMap = new Map<string, vscode.DiagnosticSeverity>([
+    ['Error', vscode.DiagnosticSeverity.Error],
+    ['Warning', vscode.DiagnosticSeverity.Warning],
+    ['Information', vscode.DiagnosticSeverity.Information],
+    ['Hint', vscode.DiagnosticSeverity.Hint],
+]);
 
 export default class CheckpatchProvider implements vscode.CodeActionProvider {
 	private linterConfig!: LinterConfig;
@@ -58,6 +66,7 @@ export default class CheckpatchProvider implements vscode.CodeActionProvider {
 			path: config.checkpatchPath,
 			args: config.checkpatchArgs,
 			excludeGlobs: config.exclude,
+			diagnosticSeverity: diagSeverityMap.get(config.diagnosticLevel) ?? vscode.DiagnosticSeverity.Information
 		};
 
 		if (this.documentListener) {
@@ -103,8 +112,8 @@ export default class CheckpatchProvider implements vscode.CodeActionProvider {
 			let fileName = matches[4];
 			let errorline = parseInt(matches[5]);
 			let range = new vscode.Range(errorline - 1, 0, errorline - 1, Number.MAX_VALUE);
+			let diagnostic = new vscode.Diagnostic(range, `${type}:${message}`, this.linterConfig.diagnosticSeverity);
 
-			let diagnostic = new vscode.Diagnostic(range, `${type}:${message}`, vscode.DiagnosticSeverity.Information);
 			diagnostic.code = type;
 			diagnostic.source = 'checkpatch';
 

@@ -57,6 +57,17 @@
 					"type": "array",
 					"default": [],
 					"description": "Glob patterns for excluding files and folders from automatic checks."
+				},
+				"checkpatch.diagnosticLevel": {
+					"type": "string",
+					"enum": [
+						"Error",
+						"Warning",
+						"Information",
+						"Hint"
+					],
+					"default": "Information",
+					"description": "Select the diagnostic level of checkpatch problems"
 				}
 			}
 		},

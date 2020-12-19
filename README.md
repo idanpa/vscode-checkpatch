@@ -14,7 +14,6 @@ sudo wget -O /usr/bin/spelling.txt "https://raw.githubusercontent.com/torvalds/l
 sudo chmod 755 /usr/bin/checkpatch.pl
   ```
 
-
 ### Windows
 
 cmd as administrator:
@@ -31,8 +30,9 @@ GNU 'diff' executable should also be available (can be done by installing [git-f
 * `checkpatch.checkCommit` Select specific commit to be tested
 * `checkpatch.toggleAutoRun` Toggle automatic checkpatch for the current workspace
 
-## settings.json
-* `checkpatch.checkpatchPath` path to the checkpatch.pl script
+## Settings
+* `checkpatch.checkpatchPath` Path to the checkpatch.pl script
 * `checkpatch.checkpatchArgs` checkpatch arguments to use
-* `checkpatch.run` control whether the linting is automatic on save or manually triggered using the `checkpatch.checkFile` command.
+* `checkpatch.run` Control whether the linting is automatic on save or manually triggered using the `checkpatch.checkFile` command.
 * `checkpatch.exclude` Glob patterns for excluding files and folders from automatic checks.
+* `checkpatch.diagnosticLevel` Diagnostic level of checkpatch errors.
