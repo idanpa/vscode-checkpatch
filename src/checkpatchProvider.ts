@@ -84,8 +84,6 @@ export default class CheckpatchProvider implements vscode.CodeActionProvider {
 
 		if (config.run === 'onSave') {
 			this.documentListener = vscode.workspace.onDidSaveTextDocument(this.checkpatchFile, this);
-			vscode.workspace.onDidOpenTextDocument(this.checkpatchFile, this);
-			vscode.workspace.textDocuments.forEach(this.checkpatchFile, this);
 		}
 	}
 
