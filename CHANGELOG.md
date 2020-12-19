@@ -1,5 +1,10 @@
 # Change Log
 
+## 0.0.8
+- Bug fix - auto-run only on save, reduce excessive checkpatch calls
+- Add setting for selecting the diagnostic severity of problems
+- Run checkpatch from workspace root, for supporting checkpatch config files
+
 ## 0.0.7
 - Bug fix - don't ignore the last error in file and respect '--strict' mode. Thanks @nunojsa.
 - Diagnostic severity changed to 'info'
