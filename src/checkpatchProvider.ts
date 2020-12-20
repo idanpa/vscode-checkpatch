@@ -77,15 +77,14 @@ export default class CheckpatchProvider implements vscode.CodeActionProvider {
 		// testing given configuration:
 		var re = /total: \d* errors, \d* warnings,( \d* checks,)? \d* lines checked/g;
 		let args = this.linterConfig.args.slice();
-		let cwd = vscode.workspace.workspaceFolders ? vscode.workspace.workspaceFolders[0].name : undefined;
+		let cwd = vscode.workspace.workspaceFolders ? vscode.workspace.workspaceFolders[0].uri.fsPath : undefined;
 		args.push('--no-tree - ');
 		let childProcess = cp.spawnSync(this.linterConfig.path, args, {shell: true, input: ' ', cwd: cwd });
-		if (childProcess.pid && re.test(childProcess.stdout.toString())) {
+		if (childProcess.pid && childProcess.stdout && re.test(childProcess.stdout.toString())) {
 			// all good
 		} else {
 			vscode.window.showErrorMessage(
 				`Checkpatch: calling '${this.linterConfig.path}' failed, please check checkpatch.checkpatchPath and checkpatch.checkpatchPath configutations.`);
-			console.log(`Checkpatch: '${this.linterConfig.path}' '${args}'`)
 			if (childProcess.stderr)
 				console.log(`Checkpatch: '${childProcess.stderr.toString()}'`)
 			return;
@@ -103,9 +102,9 @@ export default class CheckpatchProvider implements vscode.CodeActionProvider {
 
 	private parseCheckpatchLog(log: string, basePath: string): number {
 		const dictionary: { [fileUri: string]: vscode.Diagnostic[] } = {};
-
 		var re = /(WARNING|ERROR|CHECK): ?(.+):(.+)?(?:\n|\r\n|)#\d+: FILE: (.*):(\d+):/g;
 		var matches;
+
 		while (matches = re.exec(log)) {
 			let type = matches[2];
 			let message = matches[3];
@@ -143,7 +142,7 @@ export default class CheckpatchProvider implements vscode.CodeActionProvider {
 
 		let log = '';
 		let args = this.linterConfig.args.slice();
-		let cwd = vscode.workspace.workspaceFolders ? vscode.workspace.workspaceFolders[0].name : undefined;
+		let cwd = vscode.workspace.workspaceFolders ? vscode.workspace.workspaceFolders[0].uri.fsPath : undefined;
 		args.push('--show-types -f');
 		args.push(textDocument.fileName.replace(/\\/g, '/'));
 
