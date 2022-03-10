@@ -102,14 +102,14 @@ export default class CheckpatchProvider implements vscode.CodeActionProvider {
 
 	private parseCheckpatchLog(log: string, basePath: string): number {
 		const dictionary: { [fileUri: string]: vscode.Diagnostic[] } = {};
-		var re = /(WARNING|ERROR|CHECK): ?(.+):(.+)?(?:\n|\r\n|)#\d+: FILE: (.*):(\d+):/g;
+		var re = /(.*):(\d+): (WARNING|ERROR|CHECK): ?(.+):(.+)/g;
 		var matches;
 
 		while (matches = re.exec(log)) {
-			let type = matches[2];
-			let message = matches[3];
-			let fileName = matches[4];
-			let errorline = parseInt(matches[5]);
+			let fileName = matches[1];
+			let errorline = parseInt(matches[2]);
+			let type = matches[4];
+			let message = matches[5];
 			let range = new vscode.Range(errorline - 1, 0, errorline - 1, Number.MAX_VALUE);
 			let diagnostic = new vscode.Diagnostic(range, `${type}:${message}`, this.linterConfig.diagnosticSeverity);
 
@@ -143,7 +143,9 @@ export default class CheckpatchProvider implements vscode.CodeActionProvider {
 		let log = '';
 		let args = this.linterConfig.args.slice();
 		let cwd = vscode.workspace.workspaceFolders ? vscode.workspace.workspaceFolders[0].uri.fsPath : undefined;
-		args.push('--show-types -f');
+		args.push('--show-types');
+		args.push('--showfile');
+		args.push('-f');
 		args.push(textDocument.fileName.replace(/\\/g, '/'));
 
 		let childProcess = cp.spawn(this.linterConfig.path, args, { shell: true, cwd: cwd });
@@ -195,6 +197,7 @@ export default class CheckpatchProvider implements vscode.CodeActionProvider {
 		if (commitValue && commitValue.description) {
 			let log = '';
 			let args = this.linterConfig.args.slice();
+			args.push('--showfile');
 			args.push('-g');
 			args.push(commitValue.description);
 
