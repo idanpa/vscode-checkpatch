@@ -197,6 +197,7 @@ export default class CheckpatchProvider implements vscode.CodeActionProvider {
 		if (commitValue && commitValue.description) {
 			let log = '';
 			let args = this.linterConfig.args.slice();
+			args.push('--show-types');
 			args.push('--showfile');
 			args.push('-g');
 			args.push(commitValue.description);
