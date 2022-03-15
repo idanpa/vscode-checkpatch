@@ -33,6 +33,7 @@ GNU 'diff' executable should also be available (can be done by installing [git-f
 ## Settings
 * `checkpatch.checkpatchPath` Path to the checkpatch.pl script
 * `checkpatch.checkpatchArgs` checkpatch arguments to use
+* `checkpatch.useFolderAsCwd` Relative to multiroot workspace layout. Whether the linter should run in the workspace where the file is from or use the root workspace
 * `checkpatch.run` Control whether the linting is automatic on save or manually triggered using the `checkpatch.checkFile` command.
 * `checkpatch.exclude` Glob patterns for excluding files and folders from automatic checks.
 * `checkpatch.diagnosticLevel` Diagnostic level of checkpatch errors.
