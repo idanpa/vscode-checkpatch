@@ -35,14 +35,16 @@
 				"checkpatch.checkpatchPath": {
 					"type": "string",
 					"default": "checkpatch.pl",
-					"description": "Path to the checkpatch.pl script"
+					"description": "Path to the checkpatch.pl script. Should be set at least for the root workspace",
+					"scope": "resource"
 				},
 				"checkpatch.checkpatchArgs": {
 					"type": "array",
 					"default": [
 						"--no-tree"
 					],
-					"description": "Arguments for the checkpatch script"
+					"description": "Arguments for the checkpatch script",
+					"scope": "resource"
 				},
 				"checkpatch.run": {
 					"type": "string",
@@ -51,12 +53,13 @@
 						"manual"
 					],
 					"default": "onSave",
-					"description": "Whether the linter is run automatically on save or manually."
+					"description": "Whether the linter is run automatically on save or manually"
 				},
 				"checkpatch.exclude": {
 					"type": "array",
 					"default": [],
-					"description": "Glob patterns for excluding files and folders from automatic checks."
+					"description": "Glob patterns for excluding files and folders from automatic checks",
+					"scope": "resource"
 				},
 				"checkpatch.diagnosticLevel": {
 					"type": "string",
@@ -68,21 +71,31 @@
 					],
 					"default": "Information",
 					"description": "Select the diagnostic level of checkpatch problems"
+				},
+				"checkpatch.useFolderAsCwd": {
+					"type": "boolean",
+					"default": false,
+					"description": "Whether the linter should use current folder as cwd or run from root folder instead. Only applies when there `#checkpatch.checkpatchPath#` is not set for current folder",
+					"scope": "resource"
 				}
 			}
 		},
 		"commands": [
 			{
 				"command": "checkpatch.checkFile",
-				"title": "Checkpatch Selected File"
+				"title": "Checkpatch: Check Selected File"
 			},
 			{
 				"command": "checkpatch.checkCommit",
-				"title": "Checkpatch Commit"
+				"title": "Checkpatch: Check Commit"
 			},
 			{
 				"command": "checkpatch.toggleAutoRun",
-				"title": "Toggle Checkpatch for the Current Workspace"
+				"title": "Checkpatch: Toggle Run Mode For The Current Workspace"
+			},
+			{
+				"command": "checkpatch.cleanDiagnostic",
+				"title": "Checkpatch: Clean Current Diagnostic"
 			}
 		],
 		"problemMatchers": [
@@ -103,6 +116,13 @@
 						"regexp": "#\\d+: FILE: (.*):(\\d+):",
 						"file": 1,
 						"line": 2
+					},
+					{
+						"regexp": "(.*):(\\d+): (WARNING|ERROR|CHECK): ?(.+):(.+)",
+						"file": 1,
+						"line": 2,
+						"severity": 3,
+						"message": 5
 					}
 				]
 			}
@@ -136,6 +156,7 @@
 		"@types/vscode": "^1.34.0",
 		"@typescript-eslint/eslint-plugin": "^3.0.2",
 		"@typescript-eslint/parser": "^3.0.2",
+		"esbuild": "^0.14.25",
 		"eslint": "^7.1.0",
 		"typescript": "^4.0.2"
 	},
