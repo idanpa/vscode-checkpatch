@@ -80,13 +80,20 @@ export default class CheckpatchProvider implements vscode.CodeActionProvider {
 		let cwd = vscode.workspace.workspaceFolders ? vscode.workspace.workspaceFolders[0].uri.fsPath : undefined;
 		args.push('--no-tree - ');
 		let childProcess = cp.spawnSync(this.linterConfig.path, args, {shell: true, input: ' ', cwd: cwd });
-		if (childProcess.pid && childProcess.stdout && re.test(childProcess.stdout.toString())) {
+		if (childProcess.pid && childProcess.stdout) {
 			// all good
 		} else {
 			vscode.window.showErrorMessage(
 				`Checkpatch: calling '${this.linterConfig.path}' failed, please check checkpatch.checkpatchPath and checkpatch.checkpatchPath configutations.`);
+			return;
+		}
+		if (!re.test(childProcess.stdout.toString())) {
 			if (childProcess.stderr)
-				console.log(`Checkpatch: '${childProcess.stderr.toString()}'`)
+				vscode.window.showErrorMessage(
+					`Checkpatch: '${childProcess.stderr.toString()}'`);
+			else
+				vscode.window.showErrorMessage(
+					`Checkpatch: unexpected output '${childProcess.stdout.toString()}'`);
 			return;
 		}
 
