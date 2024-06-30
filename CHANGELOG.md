@@ -1,4 +1,6 @@
 # Change Log
+## 0.09 
+- Better error message on bad configuration
 
 ## 0.0.8
 - Bug fix - auto-run only on save, reduce excessive checkpatch calls
